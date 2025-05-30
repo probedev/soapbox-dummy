@@ -1,27 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  CartesianGrid,
+} from "recharts"
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartLegend,
-  ChartTooltip,
-} from "@/components/ui/chart"
-import {
-  ChartTooltipContent,
-} from "@/components/ui/chart-tooltip-content"
-import {
-  ChartLegendContent,
-} from "@/components/ui/chart-legend-content"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Select,
   SelectContent,
@@ -29,32 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { ChartContainer } from "@/components/ui/chart"
+import { chartConfig } from "@/components/ui/chart-config"
+import { ChartTooltipContent } from "@/components/ui/chart-tooltip-content"
+import { ChartLegendContent } from "@/components/ui/chart-legend-content"
 
-export const description = "An interactive area chart"
-
-const chartData = [
-  { date: "2024-04-01", desktop: 222, mobile: 150 },
-  { date: "2024-04-02", desktop: 97, mobile: 180 },
-  { date: "2024-04-03", desktop: 167, mobile: 120 },
-  { date: "2024-04-04", desktop: 242, mobile: 260 },
-  { date: "2024-04-05", desktop: 373, mobile: 290 },
-  { date: "2024-04-06", desktop: 301, mobile: 340 }
-  // ... shorten for brevity
-]
-
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  desktop: {
-    label: "Desktop",
-    color: "var(--color-desktop)",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "var(--color-mobile)",
-  },
-} satisfies ChartConfig
+import { chartData } from "@/data/dummy"
 
 export default function Page() {
   const [timeRange, setTimeRange] = React.useState("90d")
@@ -65,6 +32,7 @@ export default function Page() {
     let daysToSubtract = 90
     if (timeRange === "30d") daysToSubtract = 30
     if (timeRange === "7d") daysToSubtract = 7
+
     const startDate = new Date(referenceDate)
     startDate.setDate(startDate.getDate() - daysToSubtract)
     return date >= startDate
@@ -72,33 +40,24 @@ export default function Page() {
 
   return (
     <Card className="pt-0">
-      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
-        <div className="grid flex-1 gap-1">
-          <CardTitle>Area Chart - Interactive</CardTitle>
-          <CardDescription>
+      <div className="flex items-center gap-2 border-b px-6 py-5">
+        <div className="flex-1">
+          <div className="text-lg font-semibold">Area Chart - Interactive</div>
+          <div className="text-sm text-muted-foreground">
             Showing total visitors for the last 3 months
-          </CardDescription>
+          </div>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger
-            className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
-            aria-label="Select a value"
-          >
+          <SelectTrigger className="hidden w-[160px] sm:ml-auto sm:flex">
             <SelectValue placeholder="Last 3 months" />
           </SelectTrigger>
-          <SelectContent className="rounded-xl">
-            <SelectItem value="90d" className="rounded-lg">
-              Last 3 months
-            </SelectItem>
-            <SelectItem value="30d" className="rounded-lg">
-              Last 30 days
-            </SelectItem>
-            <SelectItem value="7d" className="rounded-lg">
-              Last 7 days
-            </SelectItem>
+          <SelectContent>
+            <SelectItem value="90d">Last 3 months</SelectItem>
+            <SelectItem value="30d">Last 30 days</SelectItem>
+            <SelectItem value="7d">Last 7 days</SelectItem>
           </SelectContent>
         </Select>
-      </CardHeader>
+      </div>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={chartConfig}
@@ -107,12 +66,28 @@ export default function Page() {
           <AreaChart data={filteredData}>
             <defs>
               <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-desktop)" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="var(--color-desktop)" stopOpacity={0.1} />
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-desktop)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-desktop)"
+                  stopOpacity={0.1}
+                />
               </linearGradient>
               <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-mobile)" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="var(--color-mobile)" stopOpacity={0.1} />
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-mobile)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-mobile)"
+                  stopOpacity={0.1}
+                />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
@@ -130,20 +105,6 @@ export default function Page() {
                 })
               }}
             />
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }}
-                  indicator="dot"
-                />
-              }
-            />
             <Area
               dataKey="mobile"
               type="natural"
@@ -158,7 +119,15 @@ export default function Page() {
               stroke="var(--color-desktop)"
               stackId="a"
             />
-            <ChartLegend content={<ChartLegendContent />} />
+            <ChartTooltipContent
+              labelFormatter={(value) =>
+                new Date(value).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })
+              }
+            />
+            <ChartLegendContent />
           </AreaChart>
         </ChartContainer>
       </CardContent>
